@@ -21,7 +21,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; min-height: 100vh; }
 
-    /* EKRAN LOGOWANIA - Zabezpieczone nakładanie */
+    /* EKRAN LOGOWANIA */
     #auth-screen {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -264,13 +264,41 @@
         <div id="students-list"></div>
       </section>
 
-      <!-- FINANSE -->
+      <!-- FINANSE (PRZYWRÓCONA PEŁNA WERSJA) -->
       <section id="finanse" class="tab-content">
-        <div class="section-title">Podsumowanie Finansowe</div>
+        <div class="section-title">
+          <span>Podsumowanie Finansowe</span>
+          <button class="btn btn-primary" onclick="exportCsv()" style="padding: 4px 10px; font-size: 11px; width:auto;"><i data-lucide="download"></i> CSV</button>
+        </div>
+        
+        <!-- Wybór miesiąca w finansach -->
+        <div class="chip-scroll" id="fin-months"></div>
+
+        <!-- Główny banner przychodu -->
         <div style="background: var(--card-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px;">
           <div style="font-size: 12px; color: var(--text-muted); font-weight: 700;">CAŁKOWITY PRZYCHÓD MIESIĄCA</div>
           <div style="font-size: 22px; font-weight: 700;" id="fin-total">0 zł</div>
         </div>
+
+        <!-- Rozbicie na opłacone / oczekujące -->
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+          <div style="flex: 1; background: #D1FAE5; padding: 12px; border-radius: 12px;">
+            <div style="font-size: 11px; color: #065F46; font-weight: 700;">OPŁACONE</div>
+            <div style="font-size: 18px; font-weight: 700; color: #059669;" id="fin-paid">0 zł</div>
+          </div>
+          <div style="flex: 1; background: #FEE2E2; padding: 12px; border-radius: 12px;">
+            <div style="font-size: 11px; color: #991B1B; font-weight: 700;">OCZEKUJĄCE</div>
+            <div style="font-size: 18px; font-weight: 700; color: #DC2626;" id="fin-unpaid">0 zł</div>
+          </div>
+        </div>
+
+        <!-- Filtry w finansach -->
+        <div class="chip-scroll">
+          <div class="chip active" id="f-chip-unpaid" onclick="setFinFilter('unpaid')">Do opłacenia</div>
+          <div class="chip" id="f-chip-paid" onclick="setFinFilter('paid')">Historia płatności</div>
+          <div class="chip" id="f-chip-cancelled" onclick="setFinFilter('cancelled')">Odwołane</div>
+        </div>
+
         <div id="fin-lessons-list"></div>
       </section>
 
@@ -341,6 +369,7 @@
     let lessons = [];
     let currentMonth = TODAY.substring(0, 7);
     let selectedDate = TODAY;
+    let finFilter = 'unpaid';
 
     async function initAuth() {
       const { data: { session } } = await supabaseClient.auth.getSession();
@@ -447,6 +476,30 @@
       renderAll();
     }
 
+    function setFinFilter(filter) {
+      finFilter = filter;
+      document.getElementById('f-chip-unpaid').classList.toggle('active', filter === 'unpaid');
+      document.getElementById('f-chip-paid').classList.toggle('active', filter === 'paid');
+      document.getElementById('f-chip-cancelled').classList.toggle('active', filter === 'cancelled');
+      renderFinances();
+    }
+
+    function exportCsv() {
+      let csv = 'Data,Uczeń,Przedmiot,Kwota,Status\n';
+      const filtered = lessons.filter(l => l.month === currentMonth);
+      filtered.forEach(l => {
+        const s = students.find(st => st.id === l.studentId);
+        const name = s ? s.name : 'Uczeń';
+        const status = l.isCancelled ? 'Odwołana' : (l.isPaid ? 'Opłacone' : 'Do opłacenia');
+        csv += `"${l.date}","${name}","${l.subject}","${l.price} zł","${status}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `finanse_${currentMonth}.csv`;
+      link.click();
+    }
+
     function openAddLessonModal(lesson = null) {
       const sel = document.getElementById('l-student');
       sel.innerHTML = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
@@ -542,14 +595,64 @@
       renderAll();
     }
 
+    function renderFinances() {
+      const monthsList = [
+        { label: 'Styczeń', value: currentMonth.substring(0,4)+'-01' },
+        { label: 'Luty', value: currentMonth.substring(0,4)+'-02' },
+        { label: 'Marzec', value: currentMonth.substring(0,4)+'-03' },
+        { label: 'Kwiecień', value: currentMonth.substring(0,4)+'-04' },
+        { label: 'Maj', value: currentMonth.substring(0,4)+'-05' },
+        { label: 'Czerwiec', value: currentMonth.substring(0,4)+'-06' },
+        { label: 'Lipiec', value: currentMonth.substring(0,4)+'-07' },
+        { label: 'Sierpień', value: currentMonth.substring(0,4)+'-08' },
+        { label: 'Wrzesień', value: currentMonth.substring(0,4)+'-09' },
+        { label: 'Październik', value: currentMonth.substring(0,4)+'-10' },
+        { label: 'Listopad', value: currentMonth.substring(0,4)+'-11' },
+        { label: 'Grudzień', value: currentMonth.substring(0,4)+'-12' }
+      ];
+
+      document.getElementById('fin-months').innerHTML = monthsList.map(m => `
+        <div class="chip ${currentMonth === m.value ? 'active' : ''}" onclick="currentMonth='${m.value}'; renderAll();">${m.label}</div>
+      `).join('');
+
+      const monthly = lessons.filter(l => l.month === currentMonth);
+      const total = monthly.filter(l => !l.isCancelled).reduce((a, b) => a + b.price, 0);
+      const paid = monthly.filter(l => l.isPaid && !l.isCancelled).reduce((a, b) => a + b.price, 0);
+      const unpaid = total - paid;
+
+      document.getElementById('fin-total').innerText = `${total} zł`;
+      document.getElementById('fin-paid').innerText = `${paid} zł`;
+      document.getElementById('fin-unpaid').innerText = `${unpaid} zł`;
+
+      const list = monthly.filter(l => {
+        if (finFilter === 'unpaid') return !l.isPaid && !l.isCancelled;
+        if (finFilter === 'paid') return l.isPaid && !l.isCancelled;
+        if (finFilter === 'cancelled') return l.isCancelled;
+        return true;
+      });
+
+      document.getElementById('fin-lessons-list').innerHTML = list.map(l => {
+        const s = students.find(st => st.id === l.studentId);
+        return `<div class="lesson-card ${l.isCancelled ? 'cancelled' : ''}">
+          <div>
+            <strong>${s ? s.name : 'Uczeń'}</strong><br>
+            <small>${l.date} • ${l.price} zł ${l.isCancelled ? '(Odwołana)' : ''}</small>
+          </div>
+          <button class="badge-btn ${l.isPaid ? 'badge-paid' : 'badge-unpaid'}" onclick="togglePaid('${l.id}')">
+            ${l.isPaid ? 'Opłacone' : 'Nieopłacone'}
+          </button>
+        </div>`;
+      }).join('') || '<div style="color:var(--text-muted); text-align:center; padding:15px;">Brak pozycji w tym widoku.</div>';
+    }
+
     function renderAll() {
       document.getElementById('today-count').innerText = lessons.filter(l => l.date === TODAY && !l.isCancelled).length;
       document.getElementById('students-count').innerText = students.length;
-      const monthly = lessons.filter(l => l.date.startsWith(currentMonth) && !l.isCancelled);
-      const totalRev = monthly.reduce((a, b) => a + b.price, 0);
+      const monthlyActive = lessons.filter(l => l.month === currentMonth && !l.isCancelled);
+      const totalRev = monthlyActive.reduce((a, b) => a + b.price, 0);
       document.getElementById('month-revenue').innerText = `${totalRev} zł`;
-      document.getElementById('fin-total').innerText = `${totalRev} zł`;
 
+      // Dzisiejsze
       document.getElementById('today-lessons-list').innerHTML = lessons.filter(l => l.date === TODAY).map(l => {
         const s = students.find(st => st.id === l.studentId);
         return `<div class="lesson-card">
@@ -561,6 +664,7 @@
         </div>`;
       }).join('') || '<div style="color:var(--text-muted); text-align:center;">Brak lekcji na dziś.</div>';
 
+      // Kalendarz
       const monthsList = [
         { label: 'Styczeń', value: currentMonth.substring(0,4)+'-01' },
         { label: 'Luty', value: currentMonth.substring(0,4)+'-02' },
@@ -576,7 +680,7 @@
         { label: 'Grudzień', value: currentMonth.substring(0,4)+'-12' }
       ];
       document.getElementById('cal-months').innerHTML = monthsList.map(m => `
-        <div class="chip ${currentMonth === m.value.substring(0,7) ? 'active' : ''}" onclick="currentMonth='${m.value.substring(0,7)}'; renderAll();">${m.label}</div>
+        <div class="chip ${currentMonth === m.value ? 'active' : ''}" onclick="currentMonth='${m.value}'; renderAll();">${m.label}</div>
       `).join('');
 
       const [y, mNum] = currentMonth.split('-').map(Number);
@@ -603,6 +707,7 @@
         </div>`;
       }).join('') || '<div style="color:var(--text-muted); text-align:center; padding:10px;">Brak lekcji w tym dniu.</div>';
 
+      // Uczniowie
       document.getElementById('students-list').innerHTML = students.map(s => `
         <div class="student-card">
           <div><strong>${s.name}</strong><br><small>${s.subject} • ${s.rate} zł/h</small></div>
@@ -610,10 +715,8 @@
         </div>
       `).join('') || '<div style="color:var(--text-muted); text-align:center;">Brak uczniów w bazie.</div>';
 
-      document.getElementById('fin-lessons-list').innerHTML = monthly.map(l => {
-        const s = students.find(st => st.id === l.studentId);
-        return `<div class="lesson-card"><div><strong>${s?s.name:'Uczeń'}</strong><br><small>${l.date} • ${l.price} zł</small></div><button class="badge-btn ${l.isPaid?'badge-paid':'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid?'Opłacone':'Nieopłacone'}</button></div>`;
-      }).join('') || '<div style="color:var(--text-muted); text-align:center;">Brak transakcji w tym miesiącu.</div>';
+      // Wywołanie Finansów
+      renderFinances();
 
       lucide.createIcons();
     }
