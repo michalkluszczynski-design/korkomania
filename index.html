@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Korkomania - Zarządzanie Korepetycjami</title>
-  <!-- Google Fonts, Lucide Icons oraz Supabase JS Client -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,341 +16,179 @@
       --border: #E5E7EB;
       --text: #111827;
       --text-muted: #6B7280;
-      --success: #059669;
-      --danger: #DC2626;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
 
-    /* Nagłówek */
-    header {
+    /* EKRAN LOGOWANIA */
+    #auth-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
       background-color: var(--primary);
       color: #FFF;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background-color 0.3s;
-      position: sticky;
-      top: 0;
-      z-index: 90;
     }
+    .auth-card {
+      background: #FFF;
+      color: var(--text);
+      padding: 25px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .auth-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; text-align: center; color: var(--primary); }
+
+    /* APPOWY INTERFEJS */
+    #app-container { display: none; }
+    header { background-color: var(--primary); color: #FFF; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 90; }
     .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 20px; }
     .logo span { color: var(--accent); }
     .header-actions { display: flex; gap: 8px; }
-    .icon-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      color: #FFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
+    .icon-btn { background: rgba(255, 255, 255, 0.2); border: none; width: 36px; height: 36px; border-radius: 50%; color: #FFF; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .icon-btn.accent { background-color: var(--accent); }
 
-    /* Kontener Główny */
     main { max-width: 600px; margin: 0 auto; padding: 15px 20px; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Baner i Karty */
-    .banner {
-      background-color: var(--primary);
-      color: #FFF;
-      padding: 18px;
-      border-radius: 16px;
-      margin-bottom: 15px;
-      cursor: pointer;
-    }
-    .banner-sub { color: var(--accent); font-size: 11px; text-transform: uppercase; font-weight: 700; }
-    .banner-title { font-size: 20px; font-weight: 700; margin-top: 4px; }
-    .banner-detail { color: #E5E7EB; font-size: 13px; margin-top: 2px; }
-
     .metrics-grid { display: flex; gap: 8px; margin-bottom: 20px; }
-    .metric-card {
-      flex: 1;
-      background: var(--card-bg);
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      text-align: center;
-      cursor: pointer;
-    }
+    .metric-card { flex: 1; background: var(--card-bg); padding: 12px; border-radius: 12px; border: 1px solid var(--border); text-align: center; cursor: pointer; }
     .metric-value { font-size: 16px; font-weight: 700; margin-top: 4px; }
     .metric-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
 
     .section-title { font-size: 15px; font-weight: 700; margin: 15px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
 
-    /* Elementy Listy */
-    .lesson-card, .student-card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      border: 1px solid var(--border);
-    }
+    .lesson-card, .student-card { background: var(--card-bg); border-radius: 12px; padding: 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border: 1px solid var(--border); }
     .lesson-card.cancelled { background: #F3F4F6; opacity: 0.7; }
-    .lesson-card.cancelled .lesson-title { text-decoration: line-through; color: var(--text-muted); }
 
-    .badge-btn {
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-    }
+    .badge-btn { padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; border: none; cursor: pointer; }
     .badge-paid { background: #D1FAE5; color: #059669; }
     .badge-unpaid { background: #FEE2E2; color: #DC2626; }
-    .badge-cancelled { background: #E5E7EB; color: #4B5563; }
 
-    /* Chip-y i Przełączniki */
     .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
-    .chip {
-      background: var(--card-bg);
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      font-size: 12px;
-      white-space: nowrap;
-      cursor: pointer;
-    }
+    .chip { background: var(--card-bg); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 12px; white-space: nowrap; cursor: pointer; }
     .chip.active { background: var(--primary); color: #FFF; }
 
-    .view-toggle { display: flex; background: #E5E7EB; border-radius: 10px; padding: 4px; margin-bottom: 15px; }
-    .toggle-btn { flex: 1; padding: 8px; border: none; background: transparent; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; }
-    .toggle-btn.active { background: var(--primary); color: #FFF; }
-
-    /* Nawigacja Dolna */
-    nav {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: #FFF;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      z-index: 80;
-    }
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 11px;
-      cursor: pointer;
-    }
+    nav { position: fixed; bottom: 0; left: 0; right: 0; background: #FFF; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 80; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; }
     .nav-item.active { color: var(--primary); }
 
-    /* Modale i Formularze */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 100;
-    }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 20px; z-index: 100; }
     .modal.active { display: flex; }
-    .modal-body {
-      background: #FFF;
-      border-radius: 16px;
-      padding: 20px;
-      width: 100%;
-      max-width: 480px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
+    .modal-body { background: #FFF; border-radius: 16px; padding: 20px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
     .form-group { margin-bottom: 10px; }
     .form-group label { display: block; font-size: 12px; font-weight: 700; color: #4B5563; margin-bottom: 4px; }
-    .form-control {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 13px;
-      background: #F9FAFB;
-    }
+    .form-control { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: #F9FAFB; }
     .btn-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
-    .btn { padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 13px; }
+    .btn { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 13px; width: 100%; }
     .btn-primary { background: var(--primary); color: #FFF; }
+    .btn-secondary { background: #E5E7EB; color: #374151; }
     .btn-danger { background: #FEE2E2; color: #DC2626; }
-    .btn-secondary { background: transparent; color: #6B7280; }
-
-    .back-btn {
-      background: #E5E7EB;
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      margin-right: 8px;
-    }
   </style>
 </head>
 <body>
 
-  <header id="app-header">
-    <div class="logo">
-      <i data-lucide="calendar"></i>
-      korko<span>mania</span>
+  <!-- 1. EKRAN LOGOWANIA -->
+  <div id="auth-screen">
+    <div class="logo" style="margin-bottom: 25px; font-size: 28px;">
+      <i data-lucide="calendar"></i> korko<span style="color:var(--accent)">mania</span>
     </div>
-    <div class="header-actions">
-      <button class="icon-btn" onclick="openSearchModal()"><i data-lucide="search"></i></button>
-      <button class="icon-btn" onclick="showTab('ustawienia')"><i data-lucide="settings"></i></button>
-      <button class="icon-btn accent" onclick="openAddLessonModal()"><i data-lucide="plus"></i></button>
+    <div class="auth-card">
+      <div class="auth-title" id="auth-header-title">Zaloguj się</div>
+      <div class="form-group">
+        <label>Adres E-mail</label>
+        <input type="email" class="form-control" id="auth-email" placeholder="twój@email.com">
+      </div>
+      <div class="form-group">
+        <label>Hasło</label>
+        <input type="password" class="form-control" id="auth-password" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary" id="auth-submit-btn" onclick="handleAuth()" style="margin-top: 10px;">Zaloguj się</button>
+      <button class="btn btn-secondary" onclick="toggleAuthMode()" id="auth-toggle-btn" style="margin-top: 8px;">Nie masz konta? Zarejestruj się</button>
     </div>
-  </header>
+  </div>
 
-  <main>
-    <!-- PULPIT -->
-    <section id="pulpit" class="tab-content active">
-      <div id="banner-container"></div>
-      <div class="metrics-grid">
-        <div class="metric-card" onclick="showTab('kalendarz')">
-          <i data-lucide="book-open"></i>
-          <div class="metric-value" id="today-count">0</div>
-          <div class="metric-label">Lekcje dzisiaj</div>
-        </div>
-        <div class="metric-card" onclick="showTab('finanse')">
-          <i data-lucide="wallet" style="color: #059669;"></i>
-          <div class="metric-value" id="month-revenue">0 zł</div>
-          <div class="metric-label">Przychód m-ca</div>
-        </div>
-        <div class="metric-card" onclick="showTab('uczniowie')">
-          <i data-lucide="users" style="color: #F59E0B;"></i>
-          <div class="metric-value" id="students-count">0</div>
-          <div class="metric-label">Baza uczniów</div>
-        </div>
+  <!-- 2. GŁÓWNA APLIKACJA -->
+  <div id="app-container">
+    <header>
+      <div class="logo"><i data-lucide="calendar"></i> korko<span>mania</span></div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="showTab('ustawienia')"><i data-lucide="settings"></i></button>
+        <button class="icon-btn accent" onclick="openAddLessonModal()"><i data-lucide="plus"></i></button>
       </div>
-      <div class="section-title">Dzisiejsze Lekcje</div>
-      <div id="today-lessons-list"></div>
-    </section>
+    </header>
 
-    <!-- KALENDARZ -->
-    <section id="kalendarz" class="tab-content">
-      <div class="view-toggle">
-        <button class="toggle-btn active" id="v-day-btn" onclick="setCalView('day')">Widok Dnia</button>
-        <button class="toggle-btn" id="v-month-btn" onclick="setCalView('month')">Widok Miesiąca / Tygodnia</button>
-      </div>
+    <main>
+      <!-- PULPIT -->
+      <section id="pulpit" class="tab-content active">
+        <div class="metrics-grid">
+          <div class="metric-card" onclick="showTab('kalendarz')">
+            <i data-lucide="book-open"></i>
+            <div class="metric-value" id="today-count">0</div>
+            <div class="metric-label">Lekcje dzisiaj</div>
+          </div>
+          <div class="metric-card" onclick="showTab('finanse')">
+            <i data-lucide="wallet" style="color: #059669;"></i>
+            <div class="metric-value" id="month-revenue">0 zł</div>
+            <div class="metric-label">Przychód m-ca</div>
+          </div>
+          <div class="metric-card" onclick="showTab('uczniowie')">
+            <i data-lucide="users" style="color: #F59E0B;"></i>
+            <div class="metric-value" id="students-count">0</div>
+            <div class="metric-label">Baza uczniów</div>
+          </div>
+        </div>
+        <div class="section-title">Dzisiejsze Lekcje</div>
+        <div id="today-lessons-list"></div>
+      </section>
 
-      <div class="section-title">Wybierz Miesiąc:</div>
-      <div class="chip-scroll" id="cal-months"></div>
-
-      <div id="cal-day-view">
-        <div class="section-title">Wybierz Dzień w Miesiącu:</div>
+      <!-- KALENDARZ -->
+      <section id="kalendarz" class="tab-content">
+        <div class="section-title">Wybierz Dzień:</div>
         <div class="chip-scroll" id="cal-days"></div>
         <div class="section-title" id="cal-day-title">Lekcje w dniu:</div>
         <div id="cal-day-lessons"></div>
-      </div>
+      </section>
 
-      <div id="cal-month-view" style="display:none;">
-        <div class="section-title">Podział tygodniowy:</div>
-        <div id="weeks-container"></div>
-      </div>
-    </section>
-
-    <!-- UCZNIOWIE -->
-    <section id="uczniowie" class="tab-content">
-      <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-        <input type="text" class="form-control" id="student-search" placeholder="Szukaj ucznia..." oninput="renderStudents()" style="margin-bottom:0;">
-        <button class="btn btn-primary" onclick="openStudentModal()"><i data-lucide="user-plus"></i></button>
-      </div>
-      <div id="students-list"></div>
-    </section>
-
-    <!-- PROFIL UCZNIA -->
-    <section id="profil_ucznia" class="tab-content">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
-        <div style="display: flex; align-items: center;">
-          <button class="back-btn" onclick="showTab('uczniowie')"><i data-lucide="arrow-left"></i></button>
-          <span style="font-size: 18px; font-weight: 700;">Profil Ucznia</span>
+      <!-- UCZNIOWIE -->
+      <section id="uczniowie" class="tab-content">
+        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+          <input type="text" class="form-control" id="student-search" placeholder="Szukaj ucznia..." oninput="renderStudents()">
+          <button class="btn btn-primary" onclick="openStudentModal()" style="width: auto;"><i data-lucide="user-plus"></i></button>
         </div>
-        <div>
-          <button class="btn btn-danger" onclick="confirmDeleteStudent()" style="padding: 6px 10px;"><i data-lucide="trash-2"></i></button>
+        <div id="students-list"></div>
+      </section>
+
+      <!-- FINANSE -->
+      <section id="finanse" class="tab-content">
+        <div class="section-title">Podsumowanie Finansowe</div>
+        <div style="background: var(--card-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px;">
+          <div style="font-size: 12px; color: var(--text-muted); font-weight: 700;">CAŁKOWITY PRZYCHÓD MIESIĄCA</div>
+          <div style="font-size: 22px; font-weight: 700;" id="fin-total">0 zł</div>
         </div>
-      </div>
+        <div id="fin-lessons-list"></div>
+      </section>
 
-      <div style="background: var(--card-bg); padding: 16px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 15px;">
-        <h2 id="prof-name" style="font-size: 20px;"></h2>
-        <p id="prof-sub" style="color: var(--text-muted); font-size: 13px; margin-top: 2px;"></p>
-        <p id="prof-phone" style="font-size: 13px; margin-top: 8px; font-weight: 600;"></p>
-        <p id="prof-notes" style="font-size: 12px; color: var(--text-muted); font-style: italic; margin-top: 4px;"></p>
-      </div>
+      <!-- USTAWIENIA -->
+      <section id="ustawienia" class="tab-content">
+        <div class="section-title">Konto i Motyw</div>
+        <button class="btn btn-danger" onclick="handleLogout()" style="margin-bottom: 15px;">Wyloguj się</button>
+      </section>
+    </main>
 
-      <div class="section-title">Zaplanowane lekcje ucznia</div>
-      <div id="prof-lessons-list"></div>
-    </section>
+    <nav id="navbar">
+      <button class="nav-item active" onclick="showTab('pulpit')"><i data-lucide="home"></i>Pulpit</button>
+      <button class="nav-item" onclick="showTab('kalendarz')"><i data-lucide="calendar"></i>Kalendarz</button>
+      <button class="nav-item" onclick="showTab('uczniowie')"><i data-lucide="users"></i>Uczniowie</button>
+      <button class="nav-item" onclick="showTab('finanse')"><i data-lucide="wallet"></i>Finanse</button>
+    </nav>
+  </div>
 
-    <!-- FINANSE -->
-    <section id="finanse" class="tab-content">
-      <div class="section-title">
-        <span>Podsumowanie Finansowe</span>
-        <button class="btn btn-primary" onclick="exportCsv()" style="padding: 4px 10px; font-size: 11px;"><i data-lucide="download"></i> CSV</button>
-      </div>
-      <div class="chip-scroll" id="fin-months"></div>
-
-      <div style="background: var(--card-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px;">
-        <div style="font-size: 12px; color: var(--text-muted); font-weight: 700;">CAŁKOWITY PRZYCHÓD MIESIĄCA</div>
-        <div style="font-size: 22px; font-weight: 700;" id="fin-total">0 zł</div>
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <div style="flex: 1; background: #D1FAE5; padding: 12px; border-radius: 12px;">
-          <div style="font-size: 11px; color: #065F46; font-weight: 700;">OPŁACONE</div>
-          <div style="font-size: 18px; font-weight: 700; color: #059669;" id="fin-paid">0 zł</div>
-        </div>
-        <div style="flex: 1; background: #FEE2E2; padding: 12px; border-radius: 12px;">
-          <div style="font-size: 11px; color: #991B1B; font-weight: 700;">OCZEKUJĄCE</div>
-          <div style="font-size: 18px; font-weight: 700; color: #DC2626;" id="fin-unpaid">0 zł</div>
-        </div>
-      </div>
-
-      <div class="chip-scroll">
-        <div class="chip active" id="f-chip-unpaid" onclick="setFinFilter('unpaid')">Do opłacenia</div>
-        <div class="chip" id="f-chip-paid" onclick="setFinFilter('paid')">Historia płatności</div>
-        <div class="chip" id="f-chip-cancelled" onclick="setFinFilter('cancelled')">Odwołane</div>
-      </div>
-
-      <div id="fin-lessons-list"></div>
-    </section>
-
-    <!-- USTAWIENIA -->
-    <section id="ustawienia" class="tab-content">
-      <div class="section-title">Motyw Kolorystyczny</div>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button class="btn btn-primary" style="background: #0F2537;" onclick="setTheme('#0F2537')">Granatowy (Domyślny)</button>
-        <button class="btn btn-primary" style="background: #111827;" onclick="setTheme('#111827')">Ciemny Elegancki</button>
-        <button class="btn btn-primary" style="background: #064E3B;" onclick="setTheme('#064E3B')">Szmaragdowa Zieleń</button>
-        <button class="btn btn-primary" style="background: #312E81;" onclick="setTheme('#312E81')">Głęboki Fiolet</button>
-      </div>
-    </section>
-  </main>
-
-  <!-- PASEK NAWIGACJI -->
-  <nav id="navbar">
-    <button class="nav-item active" onclick="showTab('pulpit')"><i data-lucide="home"></i>Pulpit</button>
-    <button class="nav-item" onclick="showTab('kalendarz')"><i data-lucide="calendar"></i>Kalendarz</button>
-    <button class="nav-item" onclick="showTab('uczniowie')"><i data-lucide="users"></i>Uczniowie</button>
-    <button class="nav-item" onclick="showTab('finanse')"><i data-lucide="wallet"></i>Finanse</button>
-  </nav>
-
-  <!-- MODAL: DODAJ LEKCJĘ -->
+  <!-- MODAL LEKCJI -->
   <div class="modal" id="add-lesson-modal">
     <div class="modal-body">
       <div class="section-title">Planuj Nową Lekcję</div>
@@ -362,25 +199,7 @@
         </select>
       </div>
       <div class="form-group"><label>Data</label><input type="date" class="form-control" id="l-date"></div>
-      <div class="form-group"><label>Godzina rozpoczęcia</label><input type="time" class="form-control" id="l-time" value="16:00"></div>
-      <div class="form-group"><label>Czas trwania</label>
-        <select class="form-control" id="l-duration">
-          <option value="0.5">30 minut</option>
-          <option value="0.75">45 minut</option>
-          <option value="1" selected>1 godzina</option>
-          <option value="1.5">1.5 godziny</option>
-          <option value="2">2 godziny</option>
-          <option value="3">3 godziny</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Cykliczność</label>
-        <select class="form-control" id="l-repeat">
-          <option value="single">Jednorazowa lekcja</option>
-          <option value="weekly">Co tydzień (do końca czerwca)</option>
-          <option value="biweekly">Co dwa tygodnie (do końca czerwca)</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Notatka (opcjonalnie)</label><input type="text" class="form-control" id="l-notes" placeholder="np. Powtórka z algebry"></div>
+      <div class="form-group"><label>Godzina</label><input type="time" class="form-control" id="l-time" value="16:00"></div>
       <div class="btn-row">
         <button class="btn btn-secondary" onclick="closeModal('add-lesson-modal')">Anuluj</button>
         <button class="btn btn-primary" onclick="saveNewLesson()">Dodaj Lekcję</button>
@@ -388,18 +207,15 @@
     </div>
   </div>
 
-  <!-- MODAL: UCZEŃ -->
+  <!-- MODAL UCZNIA -->
   <div class="modal" id="student-modal">
     <div class="modal-body">
-      <div class="section-title">Dodaj Nowego Ucznia</div>
-      <input type="hidden" id="s-edit-id">
+      <div class="section-title">Dodaj Ucznia</div>
       <div class="form-group"><label>Imię i Nazwisko</label><input type="text" class="form-control" id="s-name" placeholder="np. Jan Kowalski"></div>
       <div class="form-group"><label>Przedmiot</label>
         <select class="form-control" id="s-subject"><option>Matematyka podst.</option><option>Matematyka rozszerz.</option><option>Angielski podst.</option><option>Angielski rozszerz.</option></select>
       </div>
-      <div class="form-group"><label>Stawka za godzinę (zł)</label><input type="number" class="form-control" id="s-rate" value="80"></div>
-      <div class="form-group"><label>Telefon</label><input type="text" class="form-control" id="s-phone" placeholder="600 111 222"></div>
-      <div class="form-group"><label>Notatki</label><input type="text" class="form-control" id="s-notes" placeholder="Notatki o uczniu"></div>
+      <div class="form-group"><label>Stawka (zł/h)</label><input type="number" class="form-control" id="s-rate" value="80"></div>
       <div class="btn-row">
         <button class="btn btn-secondary" onclick="closeModal('student-modal')">Anuluj</button>
         <button class="btn btn-primary" onclick="saveStudent()">Zapisz</button>
@@ -407,381 +223,165 @@
     </div>
   </div>
 
-  <!-- MODAL: WYSZUKIWARKA -->
-  <div class="modal" id="search-modal">
-    <div class="modal-body">
-      <div class="section-title">Szukaj Ucznia</div>
-      <input type="text" class="form-control" id="global-search" placeholder="Wpisz imię lub nazwisko..." oninput="renderGlobalSearch()">
-      <div id="search-results" style="margin-top: 10px;"></div>
-      <div class="btn-row">
-        <button class="btn btn-secondary" onclick="closeModal('search-modal')">Zamknij</button>
-      </div>
-    </div>
-  </div>
-
   <script>
-  const SUPABASE_URL = 'https://xxfristfiusislkixphf.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_KKZPJxzb-EUEt36xLHh7HQ_C1ooGAxy';
-
-let supabaseClient = null;
-try {
-  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  console.log('Połączono z Supabase pomyślnie!');
-} catch (e) {
-  console.error('Błąd inicjalizacji Supabase:', e);
-}
+    const SUPABASE_URL = 'https://xxfristfiusislkixphf.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_KKZPJxzb-EUEt36xLHh7HQ_C1ooGAxy';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const TODAY = new Date().toISOString().split('T')[0];
+    let currentUser = null;
+    let isRegisterMode = false;
     let students = [];
     let lessons = [];
-    let themeColor = localStorage.getItem('korkomania_theme') || '#0F2537';
-    let currentMonth = TODAY.substring(0, 7);
-    let selectedDate = TODAY;
-    let calViewMode = 'day';
-    let finFilter = 'unpaid';
-    let selectedStudentId = null;
 
-    async function init() {
-      setTheme(themeColor);
-      document.getElementById('l-date').value = TODAY;
-      await loadData();
-      renderAll();
+    async function initAuth() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) {
+        currentUser = session.user;
+        showApp();
+      } else {
+        showAuth();
+      }
+
+      supabaseClient.auth.onAuthStateChange((_event, session) => {
+        if (session) {
+          currentUser = session.user;
+          showApp();
+        } else {
+          currentUser = null;
+          showAuth();
+        }
+      });
       lucide.createIcons();
     }
 
-    async function loadData() {
-      if (supabaseClient) {
-        try {
-          const { data: sData } = await supabaseClient.from('students').select('*');
-          const { data: lData } = await supabaseClient.from('lessons').select('*');
-          students = sData || [];
-          lessons = (lData || []).map(l => ({
-            id: l.id,
-            seriesId: l.series_id,
-            studentId: l.student_id,
-            subject: l.subject,
-            startHour: l.start_hour,
-            durationHours: Number(l.duration_hours),
-            date: l.date,
-            month: l.month,
-            price: Number(l.price),
-            isPaid: !!l.is_paid,
-            isCancelled: !!l.is_cancelled,
-            notes: l.notes || ''
-          }));
-          return;
-        } catch (e) { console.error('Błąd Supabase:', e); }
-      }
-
-      // Dane zapasowe (localStorage)
-      students = JSON.parse(localStorage.getItem('korkomania_students')) || [
-        { id: '1', name: 'Jan Kowalski', subject: 'Matematyka rozszerz.', rate: '80', phone: '600111222', notes: '' },
-        { id: '2', name: 'Anna Nowak', subject: 'Angielski podst.', rate: '90', phone: '500333444', notes: '' }
-      ];
-      lessons = JSON.parse(localStorage.getItem('korkomania_lessons')) || [
-        { id: '1', studentId: '1', subject: 'Matematyka rozszerz.', date: TODAY, startHour: '15:00', durationHours: 1, price: 80, isPaid: true, isCancelled: false, notes: '' },
-        { id: '2', studentId: '2', subject: 'Angielski podst.', date: TODAY, startHour: '16:00', durationHours: 1.5, price: 135, isPaid: false, isCancelled: false, notes: 'Sprawdzian' }
-      ];
+    function toggleAuthMode() {
+      isRegisterMode = !isRegisterMode;
+      document.getElementById('auth-header-title').innerText = isRegisterMode ? 'Zarejestruj się' : 'Zaloguj się';
+      document.getElementById('auth-submit-btn').innerText = isRegisterMode ? 'Utwórz konto' : 'Zaloguj się';
+      document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? 'Masz już konto? Zaloguj się' : 'Nie masz konta? Zarejestruj się';
     }
 
-    function saveLocal() {
-      localStorage.setItem('korkomania_students', JSON.stringify(students));
-      localStorage.setItem('korkomania_lessons', JSON.stringify(lessons));
-      localStorage.setItem('korkomania_theme', themeColor);
+    async function handleAuth() {
+      const email = document.getElementById('auth-email').value;
+      const password = document.getElementById('auth-password').value;
+      if (!email || !password) return alert('Podaj e-mail oraz hasło!');
+
+      if (isRegisterMode) {
+        const { error } = await supabaseClient.auth.signUp({ email, password });
+        if (error) alert('Błąd rejestracji: ' + error.message);
+        else alert('Konto utworzone! Możesz się zalogować.');
+      } else {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) alert('Błąd logowania: ' + error.message);
+      }
+    }
+
+    async function handleLogout() {
+      await supabaseClient.auth.signOut();
+    }
+
+    function showAuth() {
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('app-container').style.display = 'none';
+    }
+
+    async function showApp() {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app-container').style.display = 'block';
+      await loadData();
       renderAll();
     }
 
-    function setTheme(color) {
-      themeColor = color;
-      document.documentElement.style.setProperty('--primary', color);
-      saveLocal();
+    async function loadData() {
+      if (!currentUser) return;
+      const { data: sData } = await supabaseClient.from('students').select('*').eq('user_id', currentUser.id);
+      const { data: lData } = await supabaseClient.from('lessons').select('*').eq('user_id', currentUser.id);
+      students = sData || [];
+      lessons = lData || [];
+    }
+
+    async function saveStudent() {
+      const name = document.getElementById('s-name').value;
+      const subject = document.getElementById('s-subject').value;
+      const rate = parseFloat(document.getElementById('s-rate').value) || 80;
+      if (!name) return alert('Wpisz imię!');
+
+      await supabaseClient.from('students').insert([{ name, subject, rate, user_id: currentUser.id }]);
+      closeModal('student-modal');
+      await loadData();
+      renderAll();
+    }
+
+    async function saveNewLesson() {
+      const studentId = document.getElementById('l-student').value;
+      const student = students.find(s => s.id === studentId);
+      const date = document.getElementById('l-date').value;
+      const startHour = document.getElementById('l-time').value;
+      const price = student ? (parseFloat(student.rate) || 80) : 80;
+
+      await supabaseClient.from('lessons').insert([{
+        student_id: studentId,
+        subject: document.getElementById('l-subject').value,
+        date: date,
+        month: date.substring(0, 7),
+        start_hour: startHour,
+        duration_hours: 1,
+        price: price,
+        is_paid: false,
+        is_cancelled: false,
+        user_id: currentUser.id
+      }]);
+
+      closeModal('add-lesson-modal');
+      await loadData();
+      renderAll();
+    }
+
+    async function togglePaid(id) {
+      const l = lessons.find(item => item.id === id);
+      if (!l) return;
+      await supabaseClient.from('lessons').update({ is_paid: !l.is_paid }).eq('id', id);
+      await loadData();
+      renderAll();
     }
 
     function showTab(tab) {
       document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
       document.getElementById(tab).classList.add('active');
-      document.getElementById('navbar').style.display = (tab === 'ustawienia' || tab === 'profil_ucznia') ? 'none' : 'flex';
       renderAll();
     }
 
-    function getStudentName(id) {
-      const s = students.find(st => st.id === id);
-      return s ? s.name : 'Usunięty uczeń';
-    }
+    function renderAll() {
+      document.getElementById('today-count').innerText = lessons.filter(l => l.date === TODAY && !l.is_cancelled).length;
+      document.getElementById('students-count').innerText = students.length;
 
-    function calculateEndTime(start, duration) {
-      const [h, m] = start.split(':').map(Number);
-      const total = h * 60 + m + Math.round(duration * 60);
-      const endH = Math.floor(total / 60) % 24;
-      const endM = total % 60;
-      return `${endH < 10 ? '0' + endH : endH}:${endM < 10 ? '0' + endM : endM}`;
-    }
+      const currentMonth = TODAY.substring(0, 7);
+      const total = lessons.filter(l => l.month === currentMonth && !l.is_cancelled).reduce((a, b) => a + (b.price || 0), 0);
+      document.getElementById('month-revenue').innerText = `${total} zł`;
+      document.getElementById('fin-total').innerText = `${total} zł`;
 
-    /* AKCJE NA DANYCH */
-    async function togglePaid(id) {
-      const l = lessons.find(item => item.id === id);
-      if (!l) return;
-      l.isPaid = !l.isPaid;
-      if (supabaseClient) await supabaseClient.from('lessons').update({ is_paid: l.isPaid }).eq('id', id);
-      saveLocal();
-    }
+      document.getElementById('today-lessons-list').innerHTML = lessons.filter(l => l.date === TODAY).map(l => {
+        const s = students.find(st => st.id === l.student_id);
+        return `<div class="lesson-card"><div><strong>${s?s.name:'Uczeń'}</strong><br><small>${l.subject} • ${l.start_hour}</small></div><button class="badge-btn ${l.is_paid?'badge-paid':'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.is_paid?'Opłacone':'Nieopłacone'}</button></div>`;
+      }).join('') || '<div style="color:var(--text-muted); text-align:center;">Brak lekcji na dziś.</div>';
 
-    async function toggleCancel(id) {
-      const l = lessons.find(item => item.id === id);
-      if (!l) return;
-      l.isCancelled = !l.isCancelled;
-      if (supabaseClient) await supabaseClient.from('lessons').update({ is_cancelled: l.isCancelled }).eq('id', id);
-      saveLocal();
+      document.getElementById('students-list').innerHTML = students.map(s => `<div class="student-card"><div><strong>${s.name}</strong><br><small>${s.subject} • ${s.rate} zł/h</small></div></div>`).join('');
+      lucide.createIcons();
     }
 
     function openAddLessonModal() {
       const sel = document.getElementById('l-student');
-      sel.innerHTML = students.map(s => `<option value="${s.id}">${s.name} (${s.subject})</option>`).join('');
+      sel.innerHTML = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
       openModal('add-lesson-modal');
     }
-
-    async function saveNewLesson() {
-      const studentId = document.getElementById('l-student').value;
-      const student = students.find(s => s.id === studentId);
-      const duration = parseFloat(document.getElementById('l-duration').value);
-      const rate = student ? (parseFloat(student.rate) || 80) : 80;
-      const repeat = document.getElementById('l-repeat').value;
-      const startDate = document.getElementById('l-date').value;
-
-      const newItems = [];
-      let curDate = new Date(startDate);
-      const endDate = new Date('2027-06-30');
-      const stepDays = repeat === 'biweekly' ? 14 : 7;
-
-      do {
-        const dStr = curDate.toISOString().split('T')[0];
-        newItems.push({
-          id: Date.now().toString() + Math.random().toString(36).substring(2, 5),
-          studentId,
-          subject: document.getElementById('l-subject').value,
-          date: dStr,
-          month: dStr.substring(0, 7),
-          startHour: document.getElementById('l-time').value,
-          durationHours: duration,
-          price: rate * duration,
-          isPaid: false,
-          isCancelled: false,
-          notes: document.getElementById('l-notes').value
-        });
-        curDate.setDate(curDate.getDate() + stepDays);
-      } while (repeat !== 'single' && curDate <= endDate);
-
-      lessons.push(...newItems);
-      if (supabaseClient) {
-        await supabaseClient.from('lessons').insert(newItems.map(i => ({
-          student_id: i.studentId, subject: i.subject, date: i.date, month: i.month, start_hour: i.startHour, duration_hours: i.durationHours, price: i.price, is_paid: i.isPaid, is_cancelled: i.isCancelled, notes: i.notes
-        })));
-      }
-      closeModal('add-lesson-modal');
-      saveLocal();
-    }
-
-    function openStudentModal(st = null) {
-      if (st) {
-        document.getElementById('s-edit-id').value = st.id;
-        document.getElementById('s-name').value = st.name;
-        document.getElementById('s-subject').value = st.subject;
-        document.getElementById('s-rate').value = st.rate;
-        document.getElementById('s-phone').value = st.phone || '';
-        document.getElementById('s-notes').value = st.notes || '';
-      } else {
-        document.getElementById('s-edit-id').value = '';
-        document.getElementById('s-name').value = '';
-        document.getElementById('s-rate').value = '80';
-        document.getElementById('s-phone').value = '';
-        document.getElementById('s-notes').value = '';
-      }
-      openModal('student-modal');
-    }
-
-    async function saveStudent() {
-      const id = document.getElementById('s-edit-id').value;
-      const name = document.getElementById('s-name').value;
-      if (!name) return alert('Wpisz imię i nazwisko!');
-      const subject = document.getElementById('s-subject').value;
-      const rate = document.getElementById('s-rate').value;
-      const phone = document.getElementById('s-phone').value;
-      const notes = document.getElementById('s-notes').value;
-
-      if (id) {
-        students = students.map(s => s.id === id ? { ...s, name, subject, rate, phone, notes } : s);
-        if (supabaseClient) await supabaseClient.from('students').update({ name, subject, rate, phone, notes }).eq('id', id);
-      } else {
-        const newS = { id: Date.now().toString(), name, subject, rate, phone, notes };
-        students.push(newS);
-        if (supabaseClient) await supabaseClient.from('students').insert([{ name, subject, rate, phone, notes }]);
-      }
-      closeModal('student-modal');
-      saveLocal();
-    }
-
-    function openStudentProfile(id) {
-      selectedStudentId = id;
-      const st = students.find(s => s.id === id);
-      if (!st) return;
-      document.getElementById('prof-name').innerText = st.name;
-      document.getElementById('prof-sub').innerText = `${st.subject} • ${st.rate} zł/h`;
-      document.getElementById('prof-phone').innerText = st.phone ? `Tel: ${st.phone}` : '';
-      document.getElementById('prof-notes').innerText = st.notes ? `Notatki: ${st.notes}` : '';
-
-      const stLessons = lessons.filter(l => l.studentId === id);
-      document.getElementById('prof-lessons-list').innerHTML = stLessons.map(l => `
-        <div class="lesson-card ${l.isCancelled ? 'cancelled' : ''}">
-          <div>
-            <div class="lesson-title" style="font-weight:700;">${l.date} • ${l.startHour}</div>
-            <div style="font-size:12px; color:var(--text-muted);">${l.subject} • ${l.price} zł</div>
-          </div>
-          <button class="badge-btn ${l.isPaid ? 'badge-paid' : 'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid ? 'Opłacone' : 'Nieopłacone'}</button>
-        </div>
-      `).join('') || '<div style="color:var(--text-muted); text-align:center;">Brak lekcji dla tego ucznia.</div>';
-
-      showTab('profil_ucznia');
-    }
-
-    async function confirmDeleteStudent() {
-      if (!selectedStudentId) return;
-      if (confirm('Czy na pewno chcesz usunąć tego ucznia? Przyszłe lekcje zostaną usunięte.')) {
-        lessons = lessons.filter(l => l.studentId !== selectedStudentId || l.date < TODAY);
-        students = students.filter(s => s.id !== selectedStudentId);
-        if (supabaseClient) {
-          await supabaseClient.from('students').delete().eq('id', selectedStudentId);
-        }
-        saveLocal();
-        showTab('uczniowie');
-      }
-    }
-
-    /* WYŚWIETLANIE I RENDEROWANIE */
-    function renderAll() {
-      renderDashboard();
-      renderCalendar();
-      renderStudents();
-      renderFinances();
-      lucide.createIcons();
-    }
-
-    function renderDashboard() {
-      const activeToday = lessons.filter(l => l.date === TODAY && !l.isCancelled);
-      document.getElementById('today-count').innerText = activeToday.length;
-      document.getElementById('students-count').innerText = students.length;
-
-      const monthly = lessons.filter(l => l.date.startsWith(currentMonth) && !l.isCancelled);
-      const total = monthly.reduce((a, b) => a + (b.price || 0), 0);
-      document.getElementById('month-revenue').innerText = `${total} zł`;
-
-      const list = document.getElementById('today-lessons-list');
-      const todayAll = lessons.filter(l => l.date === TODAY);
-      list.innerHTML = todayAll.map(l => `
-        <div class="lesson-card ${l.isCancelled ? 'cancelled' : ''}">
-          <div>
-            <div class="lesson-title" style="font-weight:700;">${getStudentName(l.studentId)}</div>
-            <div style="font-size:12px; color:var(--text-muted);">${l.subject} • ${l.startHour} - ${calculateEndTime(l.startHour, l.durationHours)}</div>
-          </div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-danger" style="padding:4px 8px; font-size:10px;" onclick="toggleCancel('${l.id}')">${l.isCancelled ? 'Przywróć' : 'Odwołaj'}</button>
-            <button class="badge-btn ${l.isPaid ? 'badge-paid' : 'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid ? 'Opłacone' : 'Nieopłacone'}</button>
-          </div>
-        </div>
-      `).join('') || '<div style="color:var(--text-muted); text-align:center; padding:10px;">Brak lekcji na dziś.</div>';
-    }
-
-    function renderCalendar() {
-      // Dni w kalendarzu
-      const [y, m] = currentMonth.split('-').map(Number);
-      let daysHtml = '';
-      let dateObj = new Date(y, m - 1, 1);
-      while (dateObj.getMonth() === m - 1) {
-        const dStr = dateObj.toISOString().split('T')[0];
-        const dayLabel = dateObj.getDate() + '.' + (m < 10 ? '0' + m : m);
-        daysHtml += `<div class="chip ${selectedDate === dStr ? 'active' : ''}" onclick="selectedDate='${dStr}'; renderCalendar();">${dayLabel}</div>`;
-        dateObj.setDate(dateObj.getDate() + 1);
-      }
-      document.getElementById('cal-days').innerHTML = daysHtml;
-      document.getElementById('cal-day-title').innerText = `Lekcje w dniu: ${selectedDate}`;
-
-      const dayLessons = lessons.filter(l => l.date === selectedDate);
-      document.getElementById('cal-day-lessons').innerHTML = dayLessons.map(l => `
-        <div class="lesson-card ${l.isCancelled ? 'cancelled' : ''}">
-          <div>
-            <div class="lesson-title" style="font-weight:700;">${l.startHour} - ${getStudentName(l.studentId)}</div>
-            <div style="font-size:12px; color:var(--text-muted);">${l.subject} • ${l.price} zł</div>
-          </div>
-          <button class="badge-btn ${l.isPaid ? 'badge-paid' : 'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid ? 'Opłacone' : 'Nieopłacone'}</button>
-        </div>
-      `).join('') || '<div style="color:var(--text-muted); text-align:center; padding:10px;">Brak lekcji w tym dniu.</div>';
-    }
-
-    function renderStudents() {
-      const q = document.getElementById('student-search').value.toLowerCase();
-      document.getElementById('students-list').innerHTML = students.filter(s => s.name.toLowerCase().includes(q)).map(s => `
-        <div class="student-card" onclick="openStudentProfile('${s.id}')" style="cursor:pointer;">
-          <div>
-            <div style="font-weight:700;">${s.name}</div>
-            <div style="font-size:12px; color:var(--text-muted);">${s.subject} • ${s.rate} zł/h</div>
-          </div>
-          <i data-lucide="chevron-right" style="color:var(--text-muted);"></i>
-        </div>
-      `).join('') || '<div style="color:var(--text-muted); text-align:center;">Brak uczniów w bazie.</div>';
-      lucide.createIcons();
-    }
-
-    function renderFinances() {
-      const monthly = lessons.filter(l => l.date.startsWith(currentMonth) && !l.isCancelled);
-      const total = monthly.reduce((a, b) => a + b.price, 0);
-      const paid = monthly.filter(l => l.isPaid).reduce((a, b) => a + b.price, 0);
-
-      document.getElementById('fin-total').innerText = `${total} zł`;
-      document.getElementById('fin-paid').innerText = `${paid} zł`;
-      document.getElementById('fin-unpaid').innerText = `${total - paid} zł`;
-
-      const filtered = lessons.filter(l => {
-        if (!l.date.startsWith(currentMonth)) return false;
-        if (finFilter === 'unpaid') return !l.isPaid && !l.isCancelled;
-        if (finFilter === 'paid') return l.isPaid && !l.isCancelled;
-        if (finFilter === 'cancelled') return l.isCancelled;
-        return true;
-      });
-
-      document.getElementById('fin-lessons-list').innerHTML = filtered.map(l => `
-        <div class="lesson-card">
-          <div>
-            <div style="font-weight:700;">${getStudentName(l.studentId)}</div>
-            <div style="font-size:12px; color:var(--text-muted);">${l.date} • ${l.price} zł</div>
-          </div>
-          <button class="badge-btn ${l.isPaid ? 'badge-paid' : 'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid ? 'Opłacone' : 'Nieopłacone'}</button>
-        </div>
-      `).join('') || '<div style="color:var(--text-muted); text-align:center; padding:10px;">Brak danych do wyświetlenia.</div>';
-    }
-
-    function setFinFilter(f) {
-      finFilter = f;
-      document.querySelectorAll('#finanse .chip').forEach(c => c.classList.remove('active'));
-      document.getElementById(`f-chip-${f}`).classList.add('active');
-      renderFinances();
-    }
-
-    function exportCsv() {
-      let csv = 'Data,Godzina,Uczeń,Przedmiot,Cena,Status\n';
-      lessons.filter(l => l.date.startsWith(currentMonth)).forEach(l => {
-        csv += `"${l.date}","${l.startHour}","${getStudentName(l.studentId)}","${l.subject}","${l.price}","${l.isPaid ? 'Opłacone' : 'Nieopłacone'}"\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `korkomania_${currentMonth}.csv`;
-      a.click();
-    }
-
-    function openModal(id) { document.getElementById(id).classList.add('active'); lucide.createIcons(); }
+    function openStudentModal() { openModal('student-modal'); }
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    init();
+    initAuth();
   </script>
 </body>
 </html>
+
