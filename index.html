@@ -11,7 +11,7 @@
     :root {
       --primary: #0F2537;
       --accent: #F59E0B;
-      --bg: #FAF9F6;
+      --bg: #F3F4F6;
       --card-bg: #FFFFFF;
       --border: #E5E7EB;
       --text: #111827;
@@ -19,31 +19,31 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; min-height: 100vh; }
 
-    /* EKRAN LOGOWANIA */
+    /* EKRAN LOGOWANIA - Zabezpieczone nakładanie */
     #auth-screen {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--primary);
+      z-index: 9999;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
       padding: 20px;
-      background-color: var(--primary);
-      color: #FFF;
     }
     .auth-card {
       background: #FFF;
-      color: var(--text);
-      padding: 25px;
+      padding: 30px;
       border-radius: 16px;
       width: 100%;
       max-width: 400px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     }
     .auth-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; text-align: center; color: var(--primary); }
 
-    /* GŁÓWNY KONTENER */
+    /* GŁÓWNA APLIKACJA */
     #app-container { display: none; }
 
     header {
@@ -74,24 +74,24 @@
     }
     .icon-btn.accent { background-color: var(--accent); }
 
-    main { max-width: 600px; margin: 0 auto; padding: 15px 20px; }
+    main { max-width: 800px; margin: 20px auto; padding: 0 15px; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .metrics-grid { display: flex; gap: 8px; margin-bottom: 20px; }
+    .metrics-grid { display: flex; gap: 12px; margin-bottom: 20px; }
     .metric-card {
       flex: 1;
       background: var(--card-bg);
-      padding: 12px;
+      padding: 16px;
       border-radius: 12px;
       border: 1px solid var(--border);
       text-align: center;
       cursor: pointer;
     }
-    .metric-value { font-size: 16px; font-weight: 700; margin-top: 4px; }
-    .metric-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .metric-value { font-size: 18px; font-weight: 700; margin-top: 4px; }
+    .metric-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-    .section-title { font-size: 15px; font-weight: 700; margin: 15px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
+    .section-title { font-size: 16px; font-weight: 700; margin: 15px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
 
     .lesson-card, .student-card {
       background: var(--card-bg);
@@ -106,7 +106,7 @@
     .lesson-card.cancelled { background: #F3F4F6; opacity: 0.7; }
 
     .badge-btn {
-      padding: 6px 10px;
+      padding: 6px 12px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: 700;
@@ -166,11 +166,11 @@
       border-radius: 16px;
       padding: 20px;
       width: 100%;
-      max-width: 480px;
+      max-width: 450px;
       max-height: 90vh;
       overflow-y: auto;
     }
-    .form-group { margin-bottom: 10px; }
+    .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 12px; font-weight: 700; color: #4B5563; margin-bottom: 4px; }
     .form-control {
       width: 100%;
@@ -191,7 +191,7 @@
 
   <!-- EKRAN LOGOWANIA -->
   <div id="auth-screen">
-    <div class="logo" style="margin-bottom: 25px; font-size: 28px;">
+    <div class="logo" style="margin-bottom: 25px; font-size: 28px; color:#FFF;">
       <i data-lucide="calendar"></i> korko<span style="color:var(--accent)">mania</span>
     </div>
     <div class="auth-card">
@@ -209,10 +209,9 @@
     </div>
   </div>
 
-  <!-- GŁÓWNY INTERFEJS -->
+  <!-- APLIKACJA GŁÓWNA -->
   <div id="app-container">
     <header>
-      <!-- Kliknięcie w logo przenosi na pulpit -->
       <div class="logo" onclick="showTab('pulpit')"><i data-lucide="calendar"></i> korko<span>mania</span></div>
       <div class="header-actions">
         <button class="icon-btn" onclick="showTab('ustawienia')"><i data-lucide="settings"></i></button>
@@ -252,7 +251,7 @@
         <div class="section-title">Wybierz Dzień:</div>
         <div class="chip-scroll" id="cal-days"></div>
 
-        <div class="section-title" id="cal-day-title">Lekcje w wybranym dniu:</div>
+        <div class="section-title" id="cal-day-title">Lekcje w dniu:</div>
         <div id="cal-day-lessons"></div>
       </section>
 
@@ -285,7 +284,6 @@
       </section>
     </main>
 
-    <!-- PASEK NAWIGACJI -->
     <nav id="navbar">
       <button class="nav-item active" id="nav-pulpit" onclick="showTab('pulpit')"><i data-lucide="home"></i>Pulpit</button>
       <button class="nav-item" id="nav-kalendarz" onclick="showTab('kalendarz')"><i data-lucide="calendar"></i>Kalendarz</button>
@@ -294,10 +292,11 @@
     </nav>
   </div>
 
-  <!-- MODAL: DODAJ LEKCJĘ -->
+  <!-- MODAL: EDYCJA / DODAWANIE LEKCJII -->
   <div class="modal" id="add-lesson-modal">
     <div class="modal-body">
-      <div class="section-title">Planuj Nową Lekcję</div>
+      <div class="section-title" id="lesson-modal-title">Planuj Nową Lekcję</div>
+      <input type="hidden" id="l-edit-id">
       <div class="form-group"><label>Uczeń</label><select class="form-control" id="l-student"></select></div>
       <div class="form-group"><label>Przedmiot</label>
         <select class="form-control" id="l-subject">
@@ -308,15 +307,16 @@
       <div class="form-group"><label>Godzina</label><input type="time" class="form-control" id="l-time" value="16:00"></div>
       <div class="btn-row">
         <button class="btn btn-secondary" onclick="closeModal('add-lesson-modal')">Anuluj</button>
-        <button class="btn btn-primary" onclick="saveNewLesson()" style="width:auto;">Dodaj Lekcję</button>
+        <button class="btn btn-primary" onclick="saveLesson()" style="width:auto;">Zapisz Lekcję</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: UCZEŃ -->
+  <!-- MODAL: EDYCJA / DODAWANIE UCZNIA -->
   <div class="modal" id="student-modal">
     <div class="modal-body">
-      <div class="section-title">Dodaj Ucznia</div>
+      <div class="section-title" id="student-modal-title">Dodaj Ucznia</div>
+      <input type="hidden" id="s-edit-id">
       <div class="form-group"><label>Imię i Nazwisko</label><input type="text" class="form-control" id="s-name" placeholder="np. Jan Kowalski"></div>
       <div class="form-group"><label>Przedmiot</label>
         <select class="form-control" id="s-subject"><option>Matematyka podst.</option><option>Matematyka rozszerz.</option><option>Angielski podst.</option><option>Angielski rozszerz.</option></select>
@@ -418,8 +418,7 @@
           month: l.month || l.date.substring(0, 7),
           price: Number(l.price || 0),
           isPaid: !!l.is_paid,
-          isCancelled: !!l.is_cancelled,
-          notes: l.notes || ''
+          isCancelled: !!l.is_cancelled
         }));
       } catch (e) {
         console.error('Błąd pobierania danych:', e);
@@ -448,40 +447,95 @@
       renderAll();
     }
 
-    async function saveNewLesson() {
+    function openAddLessonModal(lesson = null) {
+      const sel = document.getElementById('l-student');
+      sel.innerHTML = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      
+      if (lesson) {
+        document.getElementById('lesson-modal-title').innerText = 'Edytuj Lekcję';
+        document.getElementById('l-edit-id').value = lesson.id;
+        document.getElementById('l-student').value = lesson.studentId;
+        document.getElementById('l-subject').value = lesson.subject;
+        document.getElementById('l-date').value = lesson.date;
+        document.getElementById('l-time').value = lesson.startHour;
+      } else {
+        document.getElementById('lesson-modal-title').innerText = 'Planuj Nową Lekcję';
+        document.getElementById('l-edit-id').value = '';
+        document.getElementById('l-date').value = TODAY;
+        document.getElementById('l-time').value = '16:00';
+      }
+      openModal('add-lesson-modal');
+    }
+
+    async function saveLesson() {
+      const id = document.getElementById('l-edit-id').value;
       const studentId = document.getElementById('l-student').value;
       const student = students.find(s => s.id === studentId);
       const rate = student ? (parseFloat(student.rate) || 80) : 80;
       const startDate = document.getElementById('l-date').value;
+      const subject = document.getElementById('l-subject').value;
+      const startHour = document.getElementById('l-time').value;
 
-      await supabaseClient.from('lessons').insert([{
-        user_id: currentUser.id,
-        student_id: studentId,
-        subject: document.getElementById('l-subject').value,
-        date: startDate,
-        month: startDate.substring(0, 7),
-        start_hour: document.getElementById('l-time').value,
-        duration_hours: 1,
-        price: rate,
-        is_paid: false,
-        is_cancelled: false
-      }]);
+      if (id) {
+        await supabaseClient.from('lessons').update({
+          student_id: studentId,
+          subject: subject,
+          date: startDate,
+          month: startDate.substring(0, 7),
+          start_hour: startHour,
+          price: rate
+        }).eq('id', id);
+      } else {
+        await supabaseClient.from('lessons').insert([{
+          user_id: currentUser.id,
+          student_id: studentId,
+          subject: subject,
+          date: startDate,
+          month: startDate.substring(0, 7),
+          start_hour: startHour,
+          duration_hours: 1,
+          price: rate,
+          is_paid: false,
+          is_cancelled: false
+        }]);
+      }
 
       closeModal('add-lesson-modal');
       await loadData();
       renderAll();
     }
 
+    function openStudentModal(student = null) {
+      if (student) {
+        document.getElementById('student-modal-title').innerText = 'Edytuj Ucznia';
+        document.getElementById('s-edit-id').value = student.id;
+        document.getElementById('s-name').value = student.name;
+        document.getElementById('s-subject').value = student.subject;
+        document.getElementById('s-rate').value = student.rate;
+      } else {
+        document.getElementById('student-modal-title').innerText = 'Dodaj Ucznia';
+        document.getElementById('s-edit-id').value = '';
+        document.getElementById('s-name').value = '';
+        document.getElementById('s-rate').value = '80';
+      }
+      openModal('student-modal');
+    }
+
     async function saveStudent() {
+      const id = document.getElementById('s-edit-id').value;
       const name = document.getElementById('s-name').value;
       if (!name) return alert('Wpisz imię!');
       const subject = document.getElementById('s-subject').value;
-      const rate = document.getElementById('s-rate').value;
+      const rate = parseFloat(document.getElementById('s-rate').value) || 80;
 
-      await supabaseClient.from('students').insert([{
-        user_id: currentUser.id,
-        name, subject, rate: parseFloat(rate) || 80
-      }]);
+      if (id) {
+        await supabaseClient.from('students').update({ name, subject, rate }).eq('id', id);
+      } else {
+        await supabaseClient.from('students').insert([{
+          user_id: currentUser.id,
+          name, subject, rate
+        }]);
+      }
 
       closeModal('student-modal');
       await loadData();
@@ -494,10 +548,17 @@
       const monthly = lessons.filter(l => l.date.startsWith(currentMonth) && !l.isCancelled);
       const totalRev = monthly.reduce((a, b) => a + b.price, 0);
       document.getElementById('month-revenue').innerText = `${totalRev} zł`;
+      document.getElementById('fin-total').innerText = `${totalRev} zł`;
 
       document.getElementById('today-lessons-list').innerHTML = lessons.filter(l => l.date === TODAY).map(l => {
         const s = students.find(st => st.id === l.studentId);
-        return `<div class="lesson-card"><div><strong>${s?s.name:'Uczeń'}</strong><br><small>${l.subject} • ${l.startHour}</small></div><button class="badge-btn ${l.isPaid?'badge-paid':'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid?'Opłacone':'Nieopłacone'}</button></div>`;
+        return `<div class="lesson-card">
+          <div><strong>${s?s.name:'Uczeń'}</strong><br><small>${l.subject} • ${l.startHour}</small></div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick='openAddLessonModal(${JSON.stringify(l)})'>Edytuj</button>
+            <button class="badge-btn ${l.isPaid?'badge-paid':'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid?'Opłacone':'Nieopłacone'}</button>
+          </div>
+        </div>`;
       }).join('') || '<div style="color:var(--text-muted); text-align:center;">Brak lekcji na dziś.</div>';
 
       const monthsList = [
@@ -533,11 +594,20 @@
       const dayLessons = lessons.filter(l => l.date === selectedDate);
       document.getElementById('cal-day-lessons').innerHTML = dayLessons.map(l => {
         const s = students.find(st => st.id === l.studentId);
-        return `<div class="lesson-card"><div><strong>${l.startHour} - ${s?s.name:'Uczeń'}</strong><br><small>${l.subject} • ${l.price} zł</small></div><button class="badge-btn ${l.isPaid?'badge-paid':'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid?'Opłacone':'Nieopłacone'}</button></div>`;
+        return `<div class="lesson-card">
+          <div><strong>${l.startHour} - ${s?s.name:'Uczeń'}</strong><br><small>${l.subject} • ${l.price} zł</small></div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick='openAddLessonModal(${JSON.stringify(l)})'>Edytuj</button>
+            <button class="badge-btn ${l.isPaid?'badge-paid':'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid?'Opłacone':'Nieopłacone'}</button>
+          </div>
+        </div>`;
       }).join('') || '<div style="color:var(--text-muted); text-align:center; padding:10px;">Brak lekcji w tym dniu.</div>';
 
       document.getElementById('students-list').innerHTML = students.map(s => `
-        <div class="student-card"><div><strong>${s.name}</strong><br><small>${s.subject} • ${s.rate} zł/h</small></div></div>
+        <div class="student-card">
+          <div><strong>${s.name}</strong><br><small>${s.subject} • ${s.rate} zł/h</small></div>
+          <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick='openStudentModal(${JSON.stringify(s)})'>Edytuj</button>
+        </div>
       `).join('') || '<div style="color:var(--text-muted); text-align:center;">Brak uczniów w bazie.</div>';
 
       document.getElementById('fin-lessons-list').innerHTML = monthly.map(l => {
@@ -548,12 +618,6 @@
       lucide.createIcons();
     }
 
-    function openAddLessonModal() {
-      const sel = document.getElementById('l-student');
-      sel.innerHTML = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-      openModal('add-lesson-modal');
-    }
-    function openStudentModal() { openModal('student-modal'); }
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
