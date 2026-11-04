@@ -103,7 +103,7 @@
       margin-bottom: 10px;
       border: 1px solid var(--border);
     }
-    .lesson-card.cancelled { background: #F3F4F6; opacity: 0.7; }
+    .lesson-card.cancelled { background: #F3F4F6; opacity: 0.7; text-decoration: line-through; }
 
     .badge-btn {
       padding: 6px 12px;
@@ -115,6 +115,7 @@
     }
     .badge-paid { background: #D1FAE5; color: #059669; }
     .badge-unpaid { background: #FEE2E2; color: #DC2626; }
+    .badge-cancelled { background: #E5E7EB; color: #4B5563; }
 
     .chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
     .chip {
@@ -264,23 +265,20 @@
         <div id="students-list"></div>
       </section>
 
-      <!-- FINANSE (PRZYWRÓCONA PEŁNA WERSJA) -->
+      <!-- FINANSE -->
       <section id="finanse" class="tab-content">
         <div class="section-title">
           <span>Podsumowanie Finansowe</span>
           <button class="btn btn-primary" onclick="exportCsv()" style="padding: 4px 10px; font-size: 11px; width:auto;"><i data-lucide="download"></i> CSV</button>
         </div>
         
-        <!-- Wybór miesiąca w finansach -->
         <div class="chip-scroll" id="fin-months"></div>
 
-        <!-- Główny banner przychodu -->
         <div style="background: var(--card-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px;">
           <div style="font-size: 12px; color: var(--text-muted); font-weight: 700;">CAŁKOWITY PRZYCHÓD MIESIĄCA</div>
           <div style="font-size: 22px; font-weight: 700;" id="fin-total">0 zł</div>
         </div>
 
-        <!-- Rozbicie na opłacone / oczekujące -->
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
           <div style="flex: 1; background: #D1FAE5; padding: 12px; border-radius: 12px;">
             <div style="font-size: 11px; color: #065F46; font-weight: 700;">OPŁACONE</div>
@@ -292,7 +290,6 @@
           </div>
         </div>
 
-        <!-- Filtry w finansach -->
         <div class="chip-scroll">
           <div class="chip active" id="f-chip-unpaid" onclick="setFinFilter('unpaid')">Do opłacenia</div>
           <div class="chip" id="f-chip-paid" onclick="setFinFilter('paid')">Historia płatności</div>
@@ -476,6 +473,15 @@
       renderAll();
     }
 
+    async function toggleCancel(id) {
+      const l = lessons.find(item => item.id === id);
+      if (!l) return;
+      const nextCancelled = !l.isCancelled;
+      await supabaseClient.from('lessons').update({ is_cancelled: nextCancelled }).eq('id', id);
+      await loadData();
+      renderAll();
+    }
+
     function setFinFilter(filter) {
       finFilter = filter;
       document.getElementById('f-chip-unpaid').classList.toggle('active', filter === 'unpaid');
@@ -638,9 +644,12 @@
             <strong>${s ? s.name : 'Uczeń'}</strong><br>
             <small>${l.date} • ${l.price} zł ${l.isCancelled ? '(Odwołana)' : ''}</small>
           </div>
-          <button class="badge-btn ${l.isPaid ? 'badge-paid' : 'badge-unpaid'}" onclick="togglePaid('${l.id}')">
-            ${l.isPaid ? 'Opłacone' : 'Nieopłacone'}
-          </button>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="toggleCancel('${l.id}')">${l.isCancelled ? 'Przywróć' : 'Odwołaj'}</button>
+            <button class="badge-btn ${l.isPaid ? 'badge-paid' : 'badge-unpaid'}" onclick="togglePaid('${l.id}')">
+              ${l.isPaid ? 'Opłacone' : 'Nieopłacone'}
+            </button>
+          </div>
         </div>`;
       }).join('') || '<div style="color:var(--text-muted); text-align:center; padding:15px;">Brak pozycji w tym widoku.</div>';
     }
@@ -652,12 +661,13 @@
       const totalRev = monthlyActive.reduce((a, b) => a + b.price, 0);
       document.getElementById('month-revenue').innerText = `${totalRev} zł`;
 
-      // Dzisiejsze
+      // Dzisiejsze z przyciskiem odwołania
       document.getElementById('today-lessons-list').innerHTML = lessons.filter(l => l.date === TODAY).map(l => {
         const s = students.find(st => st.id === l.studentId);
-        return `<div class="lesson-card">
+        return `<div class="lesson-card ${l.isCancelled ? 'cancelled' : ''}">
           <div><strong>${s?s.name:'Uczeń'}</strong><br><small>${l.subject} • ${l.startHour}</small></div>
           <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="toggleCancel('${l.id}')">${l.isCancelled ? 'Przywróć' : 'Odwołaj'}</button>
             <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick='openAddLessonModal(${JSON.stringify(l)})'>Edytuj</button>
             <button class="badge-btn ${l.isPaid?'badge-paid':'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid?'Opłacone':'Nieopłacone'}</button>
           </div>
@@ -698,9 +708,10 @@
       const dayLessons = lessons.filter(l => l.date === selectedDate);
       document.getElementById('cal-day-lessons').innerHTML = dayLessons.map(l => {
         const s = students.find(st => st.id === l.studentId);
-        return `<div class="lesson-card">
+        return `<div class="lesson-card ${l.isCancelled ? 'cancelled' : ''}">
           <div><strong>${l.startHour} - ${s?s.name:'Uczeń'}</strong><br><small>${l.subject} • ${l.price} zł</small></div>
           <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="toggleCancel('${l.id}')">${l.isCancelled ? 'Przywróć' : 'Odwołaj'}</button>
             <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick='openAddLessonModal(${JSON.stringify(l)})'>Edytuj</button>
             <button class="badge-btn ${l.isPaid?'badge-paid':'badge-unpaid'}" onclick="togglePaid('${l.id}')">${l.isPaid?'Opłacone':'Nieopłacone'}</button>
           </div>
@@ -715,7 +726,7 @@
         </div>
       `).join('') || '<div style="color:var(--text-muted); text-align:center;">Brak uczniów w bazie.</div>';
 
-      // Wywołanie Finansów
+      // Finanse
       renderFinances();
 
       lucide.createIcons();
